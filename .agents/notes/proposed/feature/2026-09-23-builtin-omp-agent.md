@@ -39,10 +39,15 @@ decisions for `.agents/notes` and prohibits a second root documentation tree.
   policy, isolation model, and assignment. Lody Issue #930 is open; the planned
   `LodyAI/acp-extension-omp` repository does not yet exist.
 - Candidate repository `dustPyrotechnic/acp-extension-omp` has a `feat/bootstrap` branch at
-  `00b9bec`: Node/pnpm metadata and lockfile, Apache-2.0 license, fake child-process ready-frame
+  `554c28f`: Node/pnpm metadata and lockfile, verified Apache-2.0 license, fake child-process ready-frame
   red/green coverage, fail-closed real-contract entrypoint, package smoke, and a three-OS fake-smoke
-  CI matrix. CI run `36233916095` passed on macOS, Linux, and Windows. This is a personal candidate
+  CI matrix. CI run `36235605576` passed on macOS, Linux, and Windows. This is a personal candidate
   repository, not an accepted official source.
+- A credential-free isolated OMP 18.2.8 probe confirmed the canonical executable
+  `/opt/homebrew/Cellar/omp/18.2.8/bin/omp` and a ready frame advertising protocol 1, supported
+  versions `[1,2]`, a 1 MiB frame limit, and a 64 MiB reassembly limit. It also proved correlated
+  state/stats/models/commands responses, clean stdin-EOF exit, SIGTERM exit 143, and unsolicited
+  built-in extension events despite `--no-extensions`. It did not run a model or prove Task 1R.
 - The accounting part of Task 6A is complete upstream: Core 0.1.8 publishes bounded
   `_meta.lody.usageScopeId`, and Lody PR #970 consumes it with restart-safe accounting. The old
   local `accountingId` proposal is superseded.
