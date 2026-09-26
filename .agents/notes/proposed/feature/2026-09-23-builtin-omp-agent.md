@@ -38,11 +38,11 @@ decisions for `.agents/notes` and prohibits a second root documentation tree.
 - Task 0 is waiting for maintainer confirmation of the adapter owner, repository URL, submodule
   policy, isolation model, and assignment. Lody Issue #930 is open; the planned
   `LodyAI/acp-extension-omp` repository does not yet exist.
-- A candidate adapter bootstrap exists locally on `feat/bootstrap` at `098eeda`: Node/pnpm
-  metadata and lockfile, Apache-2.0 license, fake child-process ready-frame red/green coverage,
-  fail-closed real-contract entrypoint, package smoke, and a three-OS fake-smoke CI matrix. GitHub
-  repository creation for `dustPyrotechnic/acp-extension-omp` is blocked because the current
-  integration token cannot create repositories; no remote repository or official source is claimed.
+- Candidate repository `dustPyrotechnic/acp-extension-omp` has a `feat/bootstrap` branch at
+  `00b9bec`: Node/pnpm metadata and lockfile, Apache-2.0 license, fake child-process ready-frame
+  red/green coverage, fail-closed real-contract entrypoint, package smoke, and a three-OS fake-smoke
+  CI matrix. CI run `36233916095` passed on macOS, Linux, and Windows. This is a personal candidate
+  repository, not an accepted official source.
 - The accounting part of Task 6A is complete upstream: Core 0.1.8 publishes bounded
   `_meta.lody.usageScopeId`, and Lody PR #970 consumes it with restart-safe accounting. The old
   local `accountingId` proposal is superseded.
