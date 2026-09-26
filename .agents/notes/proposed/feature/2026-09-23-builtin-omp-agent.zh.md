@@ -35,10 +35,11 @@ Zod、Vitest、OMP JSONL RPC 和 Lody pnpm workspace。
 
 - Task 0 正等待 maintainer 确认 adapter owner、仓库 URL、submodule policy、isolation model 和
   assignment。Lody Issue #930 仍为 open；计划中的 `LodyAI/acp-extension-omp` 仓库尚不存在。
-- candidate adapter 已在本地 `feat/bootstrap` 的 `098eeda` 完成 bootstrap：Node/pnpm metadata
-  与 lockfile、Apache-2.0 license、fake child-process ready-frame 红绿覆盖、fail-closed real-contract
-  入口、package smoke 和三 OS fake-smoke CI matrix。当前 integration token 无权创建仓库，因此
-  `dustPyrotechnic/acp-extension-omp` 仍无远端仓库，也不声明它是官方 source。
+- candidate 仓库 `dustPyrotechnic/acp-extension-omp` 的 `feat/bootstrap` 分支已到
+  `00b9bec`：Node/pnpm metadata 与 lockfile、Apache-2.0 license、fake child-process ready-frame
+  红绿覆盖、fail-closed real-contract 入口、package smoke 和三 OS fake-smoke CI matrix。CI run
+  `36233916095` 已在 macOS、Linux、Windows 全部通过。它仍是个人 candidate，不是已接受的官方
+  source。
 - Task 6A 的 accounting 部分已在上游完成：Core 0.1.8 发布了 bounded
   `_meta.lody.usageScopeId`，Lody PR #970 已按 restart-safe accounting 消费它；旧的本地
   `accountingId` 提案已被取代。
