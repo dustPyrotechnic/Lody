@@ -38,6 +38,11 @@ decisions for `.agents/notes` and prohibits a second root documentation tree.
 - Task 0 is waiting for maintainer confirmation of the adapter owner, repository URL, submodule
   policy, isolation model, and assignment. Lody Issue #930 is open; the planned
   `LodyAI/acp-extension-omp` repository does not yet exist.
+- A candidate adapter bootstrap exists locally on `feat/bootstrap` at `098eeda`: Node/pnpm
+  metadata and lockfile, Apache-2.0 license, fake child-process ready-frame red/green coverage,
+  fail-closed real-contract entrypoint, package smoke, and a three-OS fake-smoke CI matrix. GitHub
+  repository creation for `dustPyrotechnic/acp-extension-omp` is blocked because the current
+  integration token cannot create repositories; no remote repository or official source is claimed.
 - The accounting part of Task 6A is complete upstream: Core 0.1.8 publishes bounded
   `_meta.lody.usageScopeId`, and Lody PR #970 consumes it with restart-safe accounting. The old
   local `accountingId` proposal is superseded.
@@ -45,7 +50,7 @@ decisions for `.agents/notes` and prohibits a second root documentation tree.
   typecheck and all five Core tests passing. It still requires review, release/tag, and immutable
   version/commit/checksum evidence.
 - Tasks 1–5 and 6B–11 have no implementation evidence yet. In particular, no real OMP contract run,
-  adapter package, Lody host wiring, packaged smoke, or UI verification has passed.
+  release-ready adapter package, Lody host wiring, Lody packaged smoke, or UI verification has passed.
 
 ## Delivery gates and structure
 
