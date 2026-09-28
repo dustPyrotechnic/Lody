@@ -39,9 +39,9 @@ decisions for `.agents/notes` and prohibits a second root documentation tree.
   policy, isolation model, and assignment. Lody Issue #930 is open; the planned
   `LodyAI/acp-extension-omp` repository does not yet exist.
 - Candidate repository `dustPyrotechnic/acp-extension-omp` has a `feat/bootstrap` branch at
-  `554c28f`: Node/pnpm metadata and lockfile, verified Apache-2.0 license, fake child-process ready-frame
+  `a678bb4`: Node/pnpm metadata and lockfile, verified Apache-2.0 license, fake child-process ready-frame
   red/green coverage, fail-closed real-contract entrypoint, package smoke, and a three-OS fake-smoke
-  CI matrix. CI run `36235605576` passed on macOS, Linux, and Windows. This is a personal candidate
+  CI matrix. CI run `36367716998` passed on macOS, Linux, and Windows. This is a personal candidate
   repository, not an accepted official source.
 - A credential-free isolated OMP 18.2.8 probe confirmed the canonical executable
   `/opt/homebrew/Cellar/omp/18.2.8/bin/omp` and a ready frame advertising protocol 1, supported
@@ -54,8 +54,14 @@ decisions for `.agents/notes` and prohibits a second root documentation tree.
 - The remaining Task 6A `stdioMcp` contract has a local Core 0.1.8 red/green implementation with
   typecheck and all five Core tests passing. It still requires review, release/tag, and immutable
   version/commit/checksum evidence.
-- Tasks 1–5 and 6B–11 have no implementation evidence yet. In particular, no real OMP contract run,
-  release-ready adapter package, Lody host wiring, Lody packaged smoke, or UI verification has passed.
+- Task 1 has partial synthetic implementation evidence: bounded UTF-8 JSONL framing, ready negotiation
+  with adapter-owned 1 MiB/64 MiB ceilings, and deterministic request/response correlation for the four
+  credential-free queries. The final suite has 39 passing tests and independent Spec/quality approval;
+  red-first failures were reported during the implementation run but were not retained as repository
+  artifacts. Session/prompt/cancel/resume/terminal and usage contracts remain unimplemented.
+- Tasks 2–5 and 6B–11 have no implementation evidence yet. In particular, no credentialed real OMP
+  contract run, release-ready adapter package, Lody host wiring, Lody packaged smoke, or UI verification
+  has passed.
 
 ## Delivery gates and structure
 
