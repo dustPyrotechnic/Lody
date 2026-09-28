@@ -36,9 +36,9 @@ Zod、Vitest、OMP JSONL RPC 和 Lody pnpm workspace。
 - Task 0 正等待 maintainer 确认 adapter owner、仓库 URL、submodule policy、isolation model 和
   assignment。Lody Issue #930 仍为 open；计划中的 `LodyAI/acp-extension-omp` 仓库尚不存在。
 - candidate 仓库 `dustPyrotechnic/acp-extension-omp` 的 `feat/bootstrap` 分支已到
-  `554c28f`：Node/pnpm metadata 与 lockfile、已核验 Apache-2.0 license、fake child-process ready-frame
+  `a678bb4`：Node/pnpm metadata 与 lockfile、已核验 Apache-2.0 license、fake child-process ready-frame
   红绿覆盖、fail-closed real-contract 入口、package smoke 和三 OS fake-smoke CI matrix。CI run
-  `36235605576` 已在 macOS、Linux、Windows 全部通过。它仍是个人 candidate，不是已接受的官方
+  `36367716998` 已在 macOS、Linux、Windows 全部通过。它仍是个人 candidate，不是已接受的官方
   source。
 - 无凭据隔离 OMP 18.2.8 探针确认 canonical executable 为
   `/opt/homebrew/Cellar/omp/18.2.8/bin/omp`；ready frame 广告 protocol 1、支持 `[1,2]`、1 MiB
@@ -50,8 +50,12 @@ Zod、Vitest、OMP JSONL RPC 和 Lody pnpm workspace。
   `accountingId` 提案已被取代。
 - Task 6A 剩余的 `stdioMcp` 合约已有基于 Core 0.1.8 的本地红绿实现，typecheck 和全部 5 个
   Core tests 通过；仍需 review、release/tag，并记录 immutable version/commit/checksum。
-- Tasks 1–5 与 6B–11 尚无实现证据；尤其没有真实 OMP contract run、release-ready adapter package、
-  Lody host wiring、Lody packaged smoke 或 UI 验证通过。
+- Task 1 已有部分 synthetic 实现证据：bounded UTF-8 JSONL framing、带 adapter 自有 1 MiB/64 MiB
+  ceiling 的 ready negotiation，以及四种无凭据 query 的 deterministic request/response correlation。
+  最终 suite 为 39 tests 全绿并通过独立 Spec/quality review；red-first 失败已在实现运行中报告，但未作为
+  repository artifact 保留。session/prompt/cancel/resume/terminal 与 usage 合约仍未实现。
+- Tasks 2–5 与 6B–11 尚无实现证据；尤其没有 credentialed real OMP contract run、release-ready
+  adapter package、Lody host wiring、Lody packaged smoke 或 UI 验证通过。
 
 ## 交付门禁与结构
 
