@@ -82,6 +82,9 @@ context/acp-agent-edit-evidence.md; adapter repos: [apps/cli/AGENTS.md](../../AG
   relay/output pipeline, and fences cleanup on the reader's real close/error event — never await
   the yauzl endpoint, whose `destroy()` does not settle.
 - Builtin Dimcode is user-installed.
+- Builtin OMP launches only the adapter entry named by `LODY_OMP_ADAPTER_PATH` until a reviewed
+  artifact is pinned; never download, bundle, or guess either the adapter or `omp`
+  ([staged integration](../../../../specs/builtin-omp.md#staged-host-integration)).
 - `npx-cache.ts`: ACP `npx` spawns force `npm_config_cache`/`NPM_CONFIG_CACHE` to the active
   profile's `npm-cache`. Automatic `_npx`/`_cacache` cleanup is allowed ONLY for that Lody-owned
   cache. Cold initialize timeout never authorizes clearing `_cacache`; whole-cache

@@ -811,7 +811,7 @@ describe('AgentConfigDialog', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it.each(['bub', 'dimcode', 'sorbet'])('%s setup retry and refresh', async (agentType) => {
+  it.each(['bub', 'dimcode', 'sorbet', 'omp'])('%s setup retry and refresh', async (agentType) => {
     const workspaceId = 'workspace-bub-test' as WorkspaceId;
     const workspaceSlug = 'workspace-bub-test';
     const mirrorRows = new Map<string, MachineFlockScanRow>();
@@ -909,6 +909,9 @@ describe('AgentConfigDialog', () => {
         'curl -fsSL https://bub.build/install.sh | bash -- --preset acp'
       );
       expect(document.body.textContent).toContain('Open install guide');
+    } else if (agentType === 'omp') {
+      expect(document.body.textContent).toContain('LODY_OMP_ADAPTER_PATH');
+      expect(document.body.textContent).not.toContain('npm install -g dimcode');
     } else if (agentType === 'dimcode') {
       expect(document.body.textContent).toContain('npm install -g dimcode');
       expect(document.body.textContent).not.toContain('Open install guide');

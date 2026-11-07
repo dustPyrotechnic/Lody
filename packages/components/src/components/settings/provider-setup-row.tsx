@@ -130,6 +130,11 @@ export function ProviderSetupRow({
     isDimcodeSetup && setup.status === 'failed' && setup.failureCode === 'runtime-unavailable';
   const showBubInstallCommand =
     isBubSetup && setup.status === 'failed' && setup.failureCode === 'runtime-unavailable';
+  const showOmpRuntimeHint =
+    config.cliType === 'builtin' &&
+    config.agentType === 'omp' &&
+    setup.status === 'failed' &&
+    setup.failureCode === 'runtime-unavailable';
   const runtime = useAtomValue(activeWorkspaceRuntimeAtom);
   const runtimeProgress = useMachineAcpBinaryProgress(runtime, setup.machineId, config.agentType);
   const machineOnline = useMachineOnlineStatus(setup.machineId) === 'online';
@@ -318,6 +323,15 @@ export function ProviderSetupRow({
                 command: <code {...stylex.props(styles.command)} />,
                 copy: <DimcodeInstallCopyButton />,
               }}
+            />
+          </p>
+        ) : showOmpRuntimeHint ? (
+          <p {...stylex.props(styles.installCommand)}>
+            <Trans
+              t={t}
+              i18nKey="settings.agent.setup.ompRuntimeHint"
+              defaults="OMP adapter or omp not found. Set <command>LODY_OMP_ADAPTER_PATH</command> to the absolute path of acp-extension-omp's dist/index.js and make sure omp is on PATH."
+              components={{ command: <code {...stylex.props(styles.command)} /> }}
             />
           </p>
         ) : (

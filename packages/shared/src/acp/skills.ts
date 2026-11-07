@@ -56,6 +56,11 @@ export const ACP_SKILL_DIRS_BY_AGENT_TYPE: Record<string, SkillDirsByAgentType> 
   // user), exactly like the Agent Skills default.
   bub: skillDirs([DEFAULT_PROJECT_SKILL_DIR], [DEFAULT_AGENTS_GLOBAL_SKILL_DIR]),
   dimcode: skillDirs([DEFAULT_PROJECT_SKILL_DIR], [DEFAULT_AGENTS_GLOBAL_SKILL_DIR]),
+  // OMP keeps Pi's layout under its own `.omp` project and `~/.omp/agent` user roots.
+  omp: skillDirs(
+    [DEFAULT_PROJECT_SKILL_DIR, '.omp/skills'],
+    ['~/.omp/agent/skills', DEFAULT_AGENTS_GLOBAL_SKILL_DIR]
+  ),
   claude: skillDirs([CLAUDE_PROJECT_SKILL_DIR], [CLAUDE_GLOBAL_SKILL_DIR]),
   'claude-acp': skillDirs([CLAUDE_PROJECT_SKILL_DIR], [CLAUDE_GLOBAL_SKILL_DIR]),
   'claude-code': skillDirs([CLAUDE_PROJECT_SKILL_DIR], [CLAUDE_GLOBAL_SKILL_DIR]),

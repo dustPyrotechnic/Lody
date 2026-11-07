@@ -1100,6 +1100,18 @@ const BUILTIN_OPTIONS: AgentTypeOption[] = [
   },
   {
     kind: 'builtin',
+    value: 'builtin:omp',
+    label: 'Oh My Pi',
+    descriptionKey: 'settings.agent.dialog.option.omp.description',
+    descriptionDefault:
+      'Use your installed omp through a local acp-extension-omp build (set LODY_OMP_ADAPTER_PATH)',
+    cliType: 'builtin',
+    agentType: 'omp',
+    experimental: true,
+    searchKeys: 'omp oh my pi acp',
+  },
+  {
+    kind: 'builtin',
     value: 'builtin:bub',
     label: 'Bub',
     descriptionKey: 'settings.agent.dialog.option.bub.description',
@@ -1400,6 +1412,11 @@ function resolveDeepSeekEndpointForm(
   return { deepseekEndpointMode: 'custom', deepseekCustomBaseUrl: stored };
 }
 
+// Non-managed builtins create through the daemon setup queue: no managed
+// runtime to prepare, but a live probe must pass before the config is published.
+const isProbeQueuedBuiltinAgentType = (agentType: string): boolean =>
+  agentType === 'bub' || agentType === 'dimcode' || agentType === 'sorbet' || agentType === 'omp';
+
 function omitDeepSeekProtectedEnv(env: Record<string, string>): Record<string, string> {
   const additionalEnv = { ...env };
   delete additionalEnv[DEEPSEEK_HARNESS_API_KEY_ENV];
@@ -1583,9 +1600,7 @@ function SupportedAgentConfigDialog(props: AgentConfigDialogProps) {
     testingBuiltinSetup &&
     publishedConfig?.machineId === machine.id &&
     publishedConfig.cliType === 'builtin' &&
-    (publishedConfig.agentType === 'bub' ||
-      publishedConfig.agentType === 'dimcode' ||
-      publishedConfig.agentType === 'sorbet');
+    isProbeQueuedBuiltinAgentType(publishedConfig.agentType);
   const builtinSetup = testingBuiltinSetup
     ? setups.find((setup) => setup.id === agentConfigId)
     : undefined;
@@ -1735,9 +1750,7 @@ function SupportedAgentConfigDialog(props: AgentConfigDialogProps) {
   // provider that fails later on its first turn.
   const isBubBuiltin = formData.cliType === 'builtin' && formData.agentType === 'bub';
   const isQueuedBuiltin =
-    isBubBuiltin ||
-    (formData.cliType === 'builtin' &&
-      (formData.agentType === 'dimcode' || formData.agentType === 'sorbet'));
+    formData.cliType === 'builtin' && isProbeQueuedBuiltinAgentType(formData.agentType);
   const deepseekEndpointMode = getDeepSeekEndpointMode(formData);
   const isManagedBuiltin =
     formData.cliType === 'builtin' && isManagedBuiltinAgentType(formData.agentType);

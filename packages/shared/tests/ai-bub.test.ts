@@ -8,6 +8,15 @@ import {
   supportsBuiltinProviderSetup,
 } from '../src/ai';
 
+describe('builtin OMP shared contract', () => {
+  it('is builtin, verified through provider setup, and never a managed download', () => {
+    expect(isBuiltinAgentType('omp')).toBe(true);
+    expect(isManagedBuiltinAgentType('omp')).toBe(false);
+    expect(supportsBuiltinProviderSetup('omp')).toBe(true);
+    expect(getStaticBuiltinAcpCapabilities('builtin', 'omp')).toBeUndefined();
+  });
+});
+
 describe('builtin Bub shared contract', () => {
   it('accepts Sorbet into the verification queue without treating it as a managed runtime', () => {
     expect(isBuiltinAgentType('sorbet')).toBe(true);

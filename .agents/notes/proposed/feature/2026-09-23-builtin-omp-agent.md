@@ -33,6 +33,24 @@ independently written tests are allowed.
 The plan lives in the owning Agent Note instead of `docs/plans`: Lody reserves cross-module
 decisions for `.agents/notes` and prohibits a second root documentation tree.
 
+## Progress snapshot (2026-10-31)
+
+This snapshot supersedes the dated facts below where they conflict.
+
+- The adapter now lives in `LodyAI/acp-extension-omp` (`main` at `f0572cd`, PR #19). It launches
+  only `omp --mode rpc`, injects no Lody extension, and resolves `omp` from PATH; the `ompPath`,
+  `OMP_PATH`, and extension-injection parts of the architecture above are not implemented. It
+  accepts host MCP server lists without forwarding them, which removes the session-creation blocker
+  found in the 2026-10-11 integration report, and advertises no optional capability.
+- No adapter artifact is published, so the Lody host takes the staged path in the
+  [Spec](../../../../specs/builtin-omp.md#staged-host-integration): builtin `omp` launches the
+  adapter entry named by `LODY_OMP_ADAPTER_PATH` with Lody's Node runtime. A runtime manifest,
+  bundled adapter, `ompPath` override, and MCP withholding without `stdioMcp` remain open.
+- Evidence for the host stage: focused Vitest suites for launch resolution, provider setup, shared
+  registration, skills, and the creation dialog; a manual probe through Lody's resolver with an
+  isolated synthetic OMP 18.12.6 profile passed `initialize` and `session/new` with a `lody` stdio
+  MCP entry, then exited 0 on stdin EOF. No prompt, model, packaged desktop, or other OS was run.
+
 ## Progress snapshot (2026-09-26)
 
 - Task 0 is waiting for maintainer confirmation of the adapter owner, repository URL, submodule
@@ -75,23 +93,23 @@ decisions for `.agents/notes` and prohibits a second root documentation tree.
 
 The adapter is reviewed and tagged before the host PR. A capability named below as conditional must
 not appear in initialize output until its gate passes.
+
 ### Phase test gates
 
 Every phase starts with the named failing test and records its red result before implementation. A
 passing synthetic fixture proves only the synthetic contract; it never substitutes for a required
 real-runtime gate.
 
-| Phase | Red/green proof | Advance only when |
-| --- | --- | --- |
-| 0 — ownership/bootstrap | fake ready-frame test, then adapter-root `pnpm test` and `pnpm build` | maintainer accepts owner, repository URL, submodule source, and in-workspace/isolation model; CI defines macOS/Linux/Windows fake-smoke matrix |
-| 1 — RPC contract | `pnpm test -- test/contract/omp-rpc` | synthetic wire parser is green; this does **not** unblock V1 |
-| 1R — real baseline | fail-closed `pnpm contract:real` against pinned OMP 18.2.8 | recorded run proves new/prompt/cancel, exact load/resume, terminal delivery order, and per-model operation identity/usage; missing binary or credentials fails the job and blocks V1 |
-| 6A — Core release | Core 0.1.8 usage tests plus focused red/green `stdioMcp` contract test, then `npm run typecheck && npm test` | released `usageScopeId` remains intact and a reviewed/tagged release contains `stdioMcp`; only Task 5 waits for that release, while Task 6B may use Core 0.1.8 |
-| 2–5, 6B–7 — adapter | focused runtime/session, extension, ACP, MCP/elicitation/permission, usage, and Core suites | each named suite green; optional feature remains absent unless its real probe passed |
-| 8 — adapter package | `pnpm check && pnpm build && pnpm test && pnpm smoke && pnpm pack`, CI fake-smoke matrix | manifest/tarball and all CI matrix jobs green; this is the sole adapter tag gate |
-| 9–10 — Lody host/UI | focused Vitest, fake-OMP dev/prod bundle smoke, provider setup and component suites | cache, setup, packaged asset, and UI behavior pass without a live-provider claim |
-| 11 — integration | root public-boundary, check, format, i18n, docs, packaged probes | separate evidence exists for unit/protocol, packages, UI, and any intentionally run real-provider test |
-
+| Phase                   | Red/green proof                                                                                              | Advance only when                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0 — ownership/bootstrap | fake ready-frame test, then adapter-root `pnpm test` and `pnpm build`                                        | maintainer accepts owner, repository URL, submodule source, and in-workspace/isolation model; CI defines macOS/Linux/Windows fake-smoke matrix                                       |
+| 1 — RPC contract        | `pnpm test -- test/contract/omp-rpc`                                                                         | synthetic wire parser is green; this does **not** unblock V1                                                                                                                         |
+| 1R — real baseline      | fail-closed `pnpm contract:real` against pinned OMP 18.2.8                                                   | recorded run proves new/prompt/cancel, exact load/resume, terminal delivery order, and per-model operation identity/usage; missing binary or credentials fails the job and blocks V1 |
+| 6A — Core release       | Core 0.1.8 usage tests plus focused red/green `stdioMcp` contract test, then `npm run typecheck && npm test` | released `usageScopeId` remains intact and a reviewed/tagged release contains `stdioMcp`; only Task 5 waits for that release, while Task 6B may use Core 0.1.8                       |
+| 2–5, 6B–7 — adapter     | focused runtime/session, extension, ACP, MCP/elicitation/permission, usage, and Core suites                  | each named suite green; optional feature remains absent unless its real probe passed                                                                                                 |
+| 8 — adapter package     | `pnpm check && pnpm build && pnpm test && pnpm smoke && pnpm pack`, CI fake-smoke matrix                     | manifest/tarball and all CI matrix jobs green; this is the sole adapter tag gate                                                                                                     |
+| 9–10 — Lody host/UI     | focused Vitest, fake-OMP dev/prod bundle smoke, provider setup and component suites                          | cache, setup, packaged asset, and UI behavior pass without a live-provider claim                                                                                                     |
+| 11 — integration        | root public-boundary, check, format, i18n, docs, packaged probes                                             | separate evidence exists for unit/protocol, packages, UI, and any intentionally run real-provider test                                                                               |
 
 ### Task 0: Confirm ownership and bootstrap the adapter repository
 

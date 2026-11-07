@@ -78,6 +78,13 @@ const isMissingDimcodeRuntimeError = (error: string | undefined): boolean => {
   );
 };
 
+const isMissingOmpRuntimeError = (error: string | undefined): boolean => {
+  const normalized = error?.toLowerCase() ?? '';
+  return (
+    normalized.includes('omp adapter is unavailable') || normalized.includes('spawn omp enoent')
+  );
+};
+
 /**
  * Owns the non-interactive half of built-in provider creation on the target
  * machine. Flock rows are the durable queue: syncing a row or restarting the
@@ -197,7 +204,7 @@ export class ProviderSetupManager {
       }
 
       // Non-managed builtins prepare their command during the live probe:
-      // Bub and Dimcode are user-installed. Keep the config
+      // Bub, Dimcode and OMP are user-installed. Keep the config
       // unpublished until that ACP process passes verification.
       if (isManagedBuiltinAgentType(setup.config.agentType)) {
         const preparing = await this.updateStatus(setup.id, attempt, 'preparing-runtime');
@@ -261,7 +268,9 @@ export class ProviderSetupManager {
         verifying.id,
         attempt,
         (verifying.config.agentType === 'bub' && isMissingBubRuntimeError(response.error)) ||
-          (verifying.config.agentType === 'dimcode' && isMissingDimcodeRuntimeError(response.error))
+          (verifying.config.agentType === 'dimcode' &&
+            isMissingDimcodeRuntimeError(response.error)) ||
+          (verifying.config.agentType === 'omp' && isMissingOmpRuntimeError(response.error))
           ? 'runtime-unavailable'
           : 'verification-failed'
       );

@@ -46,6 +46,7 @@ export const BUILTIN_AGENTS = [
   { agentType: 'bub', displayName: 'Bub' },
   { agentType: 'dimcode', displayName: 'Dimcode' },
   { agentType: 'sorbet', displayName: 'Lody Agent' },
+  { agentType: 'omp', displayName: 'Oh My Pi' },
 ] as const;
 
 export type BuiltinAgent = (typeof BUILTIN_AGENTS)[number];
@@ -76,6 +77,8 @@ const BUILTIN_ACP_TITLE_OWNERSHIP: Record<BuiltinAgentType, 'none' | 'untagged'>
   bub: 'none',
   dimcode: 'none',
   sorbet: 'none',
+  // Only an explicit `/rename` publishes an OMP title; Lody keeps generating the rest.
+  omp: 'none',
 };
 
 const builtinAcpTitleOwnership = (
@@ -703,12 +706,14 @@ export const isManagedBuiltinAgentType = (
  * Managed runtimes use it for download + verification; Bub uses the same queue
  * only to keep its user-installed command unpublished until a live probe passes.
  * Dimcode uses the same verification path with its npx-managed package.
+ * OMP verifies its locally provided adapter and user-installed `omp` the same way.
  */
 export const supportsBuiltinProviderSetup = (agentType: string): agentType is BuiltinAgentType =>
   isManagedBuiltinAgentType(agentType) ||
   agentType === 'bub' ||
   agentType === 'dimcode' ||
-  agentType === 'sorbet';
+  agentType === 'sorbet' ||
+  agentType === 'omp';
 
 export const getManagedBuiltinRuntimeByAgentType = (
   agentType: string

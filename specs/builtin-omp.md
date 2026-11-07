@@ -19,13 +19,13 @@ provider-neutral `acp-extension-core` contracts. The adapter owns the OMP child 
 RPC v1/v2 as follows:
 
 ```text
-node omp-acp.js
-  OMP_PATH=/absolute/path/to/omp
-  -> omp --mode rpc --no-extensions -e <lody-extension.mjs>
+<Lody Node> <acp-extension-omp entry>
+  -> omp --mode rpc
 ```
 
-`--no-extensions` disables ambient extension discovery while preserving the explicitly supplied Lody
-extension. The adapter must not use OMP's native ACP server as its implementation. V1 uses the user's
+The adapter launches only `omp --mode rpc`; extra launch arguments, including a Lody-owned extension,
+require a reviewed adapter contract first. The adapter must not use OMP's native ACP server as its
+implementation. V1 uses the user's
 installed OMP executable and does not place OMP itself in a Lody managed-runtime archive.
 
 The adapter is a deep module at the ACP seam. OMP-specific RPC frames, session files, events, and
@@ -98,12 +98,27 @@ tools, translates typed ask UI requests to ACP elicitation, handles tool approva
 forwards only documented lifecycle/control events. If a required bridge cannot be established, session
 setup fails instead of starting a partially integrated session.
 
+## Staged host integration
+
+Until a reviewed, immutable adapter artifact is published and read back, Lody neither pins the adapter
+in a runtime manifest nor bundles it. Builtin `omp` then launches only a locally provided adapter build:
+`LODY_OMP_ADAPTER_PATH`, read from the Agent config environment or the target machine's effective
+environment, must be the absolute path of an existing adapter entry file, otherwise launch fails before
+spawning. The capability-cache identity digests that path, so a rebuilt adapter needs an explicit
+refresh. Provider setup reports a missing adapter path or `omp` executable as runtime-unavailable and
+never downloads either.
+
+In this stage the adapter advertises no optional capability. It accepts host MCP server lists without
+forwarding them to OMP, so the host rule above, which withholds MCP servers without `stdioMcp`, is not
+yet enforced. Usage accounting follows the shared builtin path until the scope rules above are
+implemented.
+
 ## Distribution and contribution
 
 The adapter lives in a separate Apache-2.0 repository and depends on the public
 `acp-extension-core` package. MPL-2.0 `jiwangyihao/omp-acp` is protocol-research evidence only; its
-implementation is not copied. Lody consumes the adapter through a pinned submodule/build entry and
-places the JavaScript adapter and explicit extension asset beside the CLI while keeping OMP external.
+implementation is not copied. After the staged integration, Lody consumes only a pinned, checksummed adapter artifact, never the
+adapter workspace, and keeps OMP external.
 
 A community contribution first uses an Issue to confirm the adapter owner, repository URL, submodule
 policy, and contribution size. Implementation is then split so the adapter contract can be reviewed

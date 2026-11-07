@@ -31,6 +31,20 @@ Zod、Vitest、OMP JSONL RPC 和 Lody pnpm workspace。
 本计划放在所属 Agent Note 中，不使用 `docs/plans`：Lody 要求跨模块决策进入
 `.agents/notes`，并禁止新增第二套根文档树。
 
+## 进展快照（2026-10-31）
+
+与下方旧日期事实冲突时，以本快照为准。
+
+- adapter 已位于 `LodyAI/acp-extension-omp`（`main` 为 `f0572cd`，PR #19）。它只启动 `omp --mode rpc`，
+  不注入 Lody extension，从 PATH 解析 `omp`；上文架构中的 `ompPath`、`OMP_PATH` 和 extension 注入尚未实现。
+  它接受 host 的 MCP server 列表但不转发，消除了 2026-10-11 集成报告中的会话创建阻塞，且不广告任何可选能力。
+- adapter 制品尚未发布，因此 Lody host 走 [Spec](../../../../specs/builtin-omp.zh.md#分阶段宿主接入) 中的分阶段路径：
+  builtin `omp` 用 Lody 的 Node runtime 启动 `LODY_OMP_ADAPTER_PATH` 指定的 adapter 入口。runtime manifest、
+  打包 adapter、`ompPath` override，以及没有 `stdioMcp` 时不传 MCP，仍未完成。
+- host 阶段证据：启动解析、provider setup、shared 注册、skills 和创建对话框的聚焦 Vitest；经 Lody resolver
+  对隔离的合成 OMP 18.12.6 profile 手动探测，`initialize` 与带 `lody` stdio MCP 的 `session/new` 通过，
+  stdin EOF 后以 0 退出。未运行 prompt、模型、打包桌面端或其他操作系统。
+
 ## 进展快照（2026-09-26）
 
 - Task 0 正等待 maintainer 确认 adapter owner、仓库 URL、submodule policy、isolation model 和
@@ -93,16 +107,16 @@ initialize 响应中。
 每个阶段先运行命名的失败测试并记录 red，再写最小实现。合成 fixture 只证明合成合约，绝不替代
 需要的真实 runtime 门禁。
 
-| 阶段 | Red/green 证据 | 进入下一阶段条件 |
-| --- | --- | --- |
-| 0 — 归属/引导 | fake ready-frame，adapter 根目录 `pnpm test`、`pnpm build` | maintainer 接受 owner、仓库、submodule 与 isolation model；三 OS fake-smoke matrix 已定义 |
-| 1 — RPC 合成 | `pnpm test -- test/contract/omp-rpc` | 仅 wire parser 变绿，不解锁 V1 |
-| 1R — 真实 baseline | fail-closed `pnpm contract:real`，OMP 18.2.8 | 已记录 new/prompt/cancel、exact load/resume、terminal order、per-model operation usage 成功；缺 binary/credential 即阻塞 |
-| 6A — Core release | Core 0.1.8 usage tests，加 focused `stdioMcp` 红绿 compile-contract，再运行 `npm run typecheck && npm test` | 已发布 `usageScopeId` 保持完整且 reviewed/tagged release 含 `stdioMcp`；只有 Task 5 等待该 release，Task 6B 可直接使用 Core 0.1.8 |
-| 2–5、6B–7 — adapter | focused runtime/session、extension、ACP、MCP/elicitation/permission、usage、Core suites | 每个命名 suite 变绿；optional capability 仅在真实 probe 成功后广告 |
-| 8 — adapter package | `pnpm check && pnpm build && pnpm test && pnpm smoke && pnpm pack`、CI matrix | manifest/tarball/CI 都绿；这是唯一 adapter tag 门禁 |
-| 9–10 — Lody host/UI | focused Vitest、fake-OMP dev/prod bundle smoke、setup/component suites | cache、setup、packaged asset、UI 均通过且不声称 real-provider 结果 |
-| 11 — 集成 | root public-boundary、check、format、i18n、docs、packaged probe | 协议/包/UI/真实 provider（如实际运行）证据分层齐全 |
+| 阶段                | Red/green 证据                                                                                              | 进入下一阶段条件                                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 0 — 归属/引导       | fake ready-frame，adapter 根目录 `pnpm test`、`pnpm build`                                                  | maintainer 接受 owner、仓库、submodule 与 isolation model；三 OS fake-smoke matrix 已定义                                         |
+| 1 — RPC 合成        | `pnpm test -- test/contract/omp-rpc`                                                                        | 仅 wire parser 变绿，不解锁 V1                                                                                                    |
+| 1R — 真实 baseline  | fail-closed `pnpm contract:real`，OMP 18.2.8                                                                | 已记录 new/prompt/cancel、exact load/resume、terminal order、per-model operation usage 成功；缺 binary/credential 即阻塞          |
+| 6A — Core release   | Core 0.1.8 usage tests，加 focused `stdioMcp` 红绿 compile-contract，再运行 `npm run typecheck && npm test` | 已发布 `usageScopeId` 保持完整且 reviewed/tagged release 含 `stdioMcp`；只有 Task 5 等待该 release，Task 6B 可直接使用 Core 0.1.8 |
+| 2–5、6B–7 — adapter | focused runtime/session、extension、ACP、MCP/elicitation/permission、usage、Core suites                     | 每个命名 suite 变绿；optional capability 仅在真实 probe 成功后广告                                                                |
+| 8 — adapter package | `pnpm check && pnpm build && pnpm test && pnpm smoke && pnpm pack`、CI matrix                               | manifest/tarball/CI 都绿；这是唯一 adapter tag 门禁                                                                               |
+| 9–10 — Lody host/UI | focused Vitest、fake-OMP dev/prod bundle smoke、setup/component suites                                      | cache、setup、packaged asset、UI 均通过且不声称 real-provider 结果                                                                |
+| 11 — 集成           | root public-boundary、check、format、i18n、docs、packaged probe                                             | 协议/包/UI/真实 provider（如实际运行）证据分层齐全                                                                                |
 
 ### Task 1：冻结 OMP RPC 与扩展合约
 

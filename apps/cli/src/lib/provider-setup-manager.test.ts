@@ -255,7 +255,7 @@ describe('ProviderSetupManager', () => {
     }
   });
 
-  it.each(['bub', 'dimcode'])('verifies %s without managed downloads', async (agentType) => {
+  it.each(['bub', 'dimcode', 'omp'])('verifies %s without managed downloads', async (agentType) => {
     const harness = createHarness({
       getMachineAcpBinaryStatus: async () => {
         throw new Error('Non-managed builtin must not enter managed runtime preparation');
@@ -304,6 +304,13 @@ describe('ProviderSetupManager', () => {
       'Authentication required: Provider credentials are required',
       'verification-failed',
     ],
+    [
+      'omp',
+      'OMP adapter is unavailable: set LODY_OMP_ADAPTER_PATH to the absolute path of the acp-extension-omp entry',
+      'runtime-unavailable',
+    ],
+    ['omp', 'spawn omp ENOENT', 'runtime-unavailable'],
+    ['omp', 'ACP handshake timed out', 'verification-failed'],
   ] as const)('keeps failed %s probes unpublished: %s', async (agentType, error, failureCode) => {
     const harness = createHarness({
       refreshMachineAcpCapabilities: vi.fn(async () => ({

@@ -470,6 +470,84 @@ describe('resolveBuiltinACPSetting', () => {
     });
   });
 
+  it('launches the locally provided OMP adapter with the Lody Node runtime', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'lody-omp-adapter-'));
+    const adapterPath = join(root, 'dist', 'index.js');
+    try {
+      await mkdir(join(root, 'dist'));
+      await writeFile(adapterPath, '');
+      const input = {
+        cliType: 'builtin' as const,
+        agentType: 'omp',
+        env: { LODY_OMP_ADAPTER_PATH: adapterPath },
+        extraArgs: ['--verbose'],
+      };
+      const launch = await resolveACPProcessLaunchAsync(input);
+      expect(launch).toEqual({
+        command: process.execPath,
+        args: [adapterPath, '--verbose'],
+        capabilitySourceVersion: getAcpCapabilitySourceVersion(input),
+      });
+      expect(launch.capabilitySourceVersion).toMatch(
+        /^builtin-omp:local-adapter\+path:[0-9a-f]{12}$/
+      );
+      expect(
+        getAcpCapabilitySourceVersion({
+          ...input,
+          env: { LODY_OMP_ADAPTER_PATH: join(root, 'other.js') },
+        })
+      ).not.toBe(launch.capabilitySourceVersion);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it('falls back to the machine OMP adapter path when the Agent config env omits it', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'lody-omp-adapter-'));
+    const machinePath = join(root, 'machine.js');
+    const configPath = join(root, 'config.js');
+    try {
+      await writeFile(machinePath, '');
+      await writeFile(configPath, '');
+      vi.stubEnv('LODY_OMP_ADAPTER_PATH', machinePath);
+      const sessionLaunch = await resolveACPProcessLaunchAsync({
+        cliType: 'builtin',
+        agentType: 'omp',
+        env: {},
+      });
+      expect(sessionLaunch.args).toEqual([machinePath]);
+      expect(sessionLaunch.capabilitySourceVersion).toBe(
+        getAcpCapabilitySourceVersion({ cliType: 'builtin', agentType: 'omp' })
+      );
+      const configLaunch = await resolveACPProcessLaunchAsync({
+        cliType: 'builtin',
+        agentType: 'omp',
+        env: { LODY_OMP_ADAPTER_PATH: configPath },
+      });
+      expect(configLaunch.args).toEqual([configPath]);
+    } finally {
+      vi.unstubAllEnvs();
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects a missing, relative or non-file OMP adapter path before spawning', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'lody-omp-adapter-'));
+    try {
+      for (const value of [undefined, '', 'dist/index.js', root, join(root, 'missing.js')]) {
+        await expect(
+          resolveACPProcessLaunchAsync({
+            cliType: 'builtin',
+            agentType: 'omp',
+            env: value === undefined ? {} : { LODY_OMP_ADAPTER_PATH: value },
+          })
+        ).rejects.toThrow(/OMP adapter is unavailable.*LODY_OMP_ADAPTER_PATH/);
+      }
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it('launches an overridden Kimi executable in ACP login mode', async () => {
     await expect(
       resolveACPProcessLaunchAsync({

@@ -18,13 +18,12 @@ Lody 随包提供 Apache-2.0 的 `acp-extension-omp` adapter。Lody 通过 ACP �
 v1/v2：
 
 ```text
-node omp-acp.js
-  OMP_PATH=/absolute/path/to/omp
-  -> omp --mode rpc --no-extensions -e <lody-extension.mjs>
+<Lody Node> <acp-extension-omp entry>
+  -> omp --mode rpc
 ```
 
-`--no-extensions` 关闭 ambient extension 自动发现，但显式指定的 Lody extension 仍会加载。
-adapter 不得以 OMP 自带 ACP 服务作为实现。首版使用用户已安装的 OMP executable，不把 OMP
+adapter 只启动 `omp --mode rpc`；任何额外启动参数（包括 Lody 自有 extension）都要先有经审核的
+adapter 合约。adapter 不得以 OMP 自带 ACP 服务作为实现。首版使用用户已安装的 OMP executable，不把 OMP
 本体打进 Lody managed-runtime archive。
 
 adapter 是 ACP seam 上的 deep module。OMP 专属 RPC frame、session file、event 和 extension
@@ -84,11 +83,22 @@ adapter 注入一个 Lody 自有 OMP extension。它保留原生 typed `ask` 和
 把 typed ask UI request 转换为 ACP elicitation，独立处理 tool approval，并且只转发有文档合约的
 lifecycle/control event。无法建立必需 bridge 时 session setup 失败，不能启动半集成会话。
 
+## 分阶段宿主接入
+
+经审核的不可变 adapter 制品发布并完成回读之前，Lody 既不在 runtime manifest 中固定 adapter，也不打包它。
+此阶段 builtin `omp` 只启动本地提供的 adapter 构建：`LODY_OMP_ADAPTER_PATH` 从 Agent 配置环境或目标机
+有效环境读取，必须是已存在 adapter 入口文件的绝对路径，否则在 spawn 之前启动失败。capability-cache
+identity 对该路径做摘要，因此重新构建 adapter 后需要显式刷新。Provider setup 把缺失的 adapter 路径或
+`omp` executable 报告为 runtime-unavailable，且从不下载两者。
+
+此阶段 adapter 不广告任何可选能力。它接受 host 的 MCP server 列表但不转发给 OMP，所以上文「没有
+`stdioMcp` 时 host 不传递 MCP server」的规则尚未执行。用量账本在上文 scope 规则实现之前沿用共享的
+builtin 路径。
+
 ## 分发与贡献
 
 adapter 位于独立 Apache-2.0 仓库并依赖公开的 `acp-extension-core` package。MPL-2.0
-`jiwangyihao/omp-acp` 只作协议研究证据，不复制实现。Lody 通过固定 submodule/build entry
-消费 adapter，把 JavaScript adapter 与明确的 extension asset 放在 CLI 同层；OMP 本体外置。
+`jiwangyihao/omp-acp` 只作协议研究证据，不复制实现。分阶段接入之后，Lody 只消费固定且带校验和的 adapter 制品，从不消费 adapter workspace；OMP 本体外置。
 
 社区贡献先用 Issue 确认 adapter owner、仓库 URL、submodule policy 和贡献规模，再拆分实施，
 让 adapter 合约先于聚焦的 Lody host 接入接受审核。Lody PR 遵循外部贡献的 assignment 与

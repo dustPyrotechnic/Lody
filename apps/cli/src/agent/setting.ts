@@ -1,8 +1,9 @@
 import { existsSync } from 'node:fs';
+import { stat } from 'node:fs/promises';
 import { prepareMagpieRuntime } from './magpie-runtime';
 import { createHash } from 'node:crypto';
 import { homedir } from 'node:os';
-import { delimiter, dirname, join, normalize, resolve } from 'node:path';
+import { delimiter, dirname, isAbsolute, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getLodyDataDir } from '@lody/shared/node/installation-profile';
 import { inspectNpxInstallState } from './npx-cache';
@@ -188,6 +189,35 @@ const SORBET_ACP_PACKAGE_NAME = '@sorbetai/acp';
 const SORBET_ACP_DIST_TAG = 'alpha';
 const SORBET_ACP_PACKAGE = `${SORBET_ACP_PACKAGE_NAME}@${SORBET_ACP_DIST_TAG}`;
 
+/**
+ * Absolute path of the `acp-extension-omp` entry on the target machine. The
+ * adapter has no published runtime artifact yet, so builtin OMP launches only a
+ * locally provided build; the adapter itself spawns the user-installed `omp`.
+ */
+export const OMP_ADAPTER_PATH_ENV = 'LODY_OMP_ADAPTER_PATH';
+const BUILTIN_OMP_CAPABILITY_SOURCE_VERSION = 'builtin-omp:local-adapter';
+
+// Session launches pass the Agent config env, which usually omits the path, so
+// the machine environment is the fallback rather than an alternative.
+const readOmpAdapterPath = (env: NodeJS.ProcessEnv | undefined): string =>
+  env?.[OMP_ADAPTER_PATH_ENV]?.trim() || process.env[OMP_ADAPTER_PATH_ENV]?.trim() || '';
+
+async function resolveOmpAdapterPath(env: NodeJS.ProcessEnv | undefined): Promise<string> {
+  const adapterPath = readOmpAdapterPath(env);
+  const isFile =
+    isAbsolute(adapterPath) &&
+    (await stat(adapterPath).then(
+      (entry) => entry.isFile(),
+      () => false
+    ));
+  if (!isFile) {
+    throw new Error(
+      `OMP adapter is unavailable: set ${OMP_ADAPTER_PATH_ENV} to the absolute path of the acp-extension-omp entry (dist/index.js)`
+    );
+  }
+  return adapterPath;
+}
+
 // Serve npx launches from the local cache when the package is already
 // installed; go to the registry only on a cache miss. Registry agent specs are
 // exact-version pinned, so a cache hit is immutable and integrity-checked —
@@ -357,6 +387,12 @@ export function getAcpCapabilitySourceVersion(
       }
       if (input.agentType === 'dimcode') {
         return BUILTIN_DIMCODE_CAPABILITY_SOURCE_VERSION;
+      }
+      if (input.agentType === 'omp') {
+        // The adapter build has no version Lody can trust, so a changed path is a
+        // new cache identity and an in-place rebuild needs an explicit refresh.
+        const adapterPath = readOmpAdapterPath(input.env);
+        return `${BUILTIN_OMP_CAPABILITY_SOURCE_VERSION}+path:${createHash('sha256').update(adapterPath).digest('hex').slice(0, 12)}`;
       }
       if (input.agentType === 'bub') {
         // Bub is a user-installed CLI whose version Lody does not own, so the
@@ -636,6 +672,13 @@ async function resolveBuiltinACPProcessLaunch(
       args: ['acp', ...(input.extraArgs ?? [])],
       // Version changes belong to the user, including standalone installations.
       env: { DIMCODE_DISABLE_AUTOUPDATE: '1', DIMCODE_AUTOUPDATE: '0' },
+      capabilitySourceVersion: getAcpCapabilitySourceVersion(input),
+    };
+  }
+  if (input.agentType === 'omp') {
+    return {
+      command: process.execPath,
+      args: [await resolveOmpAdapterPath(input.env), ...(input.extraArgs ?? [])],
       capabilitySourceVersion: getAcpCapabilitySourceVersion(input),
     };
   }

@@ -64,6 +64,9 @@ context/message-flow.md "Upstream".
   the signer belongs to its owner's membership. List and logout use the execution journal;
   an interrupted logout can have an unknown result. Metadata lists saved credential types,
   not account identities, remote validity or environment-provided credentials.
+  Builtin OMP runs the locally built `acp-extension-omp` entry from `LODY_OMP_ADAPTER_PATH`
+  (Agent config or machine environment) with Lody's Node; the adapter spawns the
+  user-installed `omp`. Refresh capabilities after rebuilding the adapter.
 - `deepseek-harness-runtime.ts` — Provider-scoped Harness homes, atomic host bundles,
   and npx launch wrapper around the `packages/acp-extension-dsh` submodule. DSH uses
   a supported standalone Node from the final launch PATH in the target working directory.
